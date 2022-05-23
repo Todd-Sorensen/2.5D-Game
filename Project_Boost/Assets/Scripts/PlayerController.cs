@@ -10,6 +10,8 @@ public class PlayerController : MonoBehaviour
     [SerializeField] private float thrustForce = 1000f;
     [SerializeField] private float rotationSpeed = 5f;
 
+    private bool canThrust, rotateLeft, rotateRight;
+
     // Start is called before the first frame update
     void Start()
     {
@@ -17,20 +19,19 @@ public class PlayerController : MonoBehaviour
         audioSource = GetComponent<AudioSource>();   
     }
 
-    public void Thrust()
+    private void Update() 
     {
-        rb.AddRelativeForce(Vector3.up * thrustForce * Time.deltaTime);
-        if(!audioSource.isPlaying) audioSource.Play();
-    }
+        // Thrust
+        if(canThrust)
+        {
+            rb.AddRelativeForce(Vector3.up * thrustForce * Time.deltaTime);
+            if(!audioSource.isPlaying) audioSource.Play();
+        }
+        else audioSource.Stop();
 
-    public void RotateLeft()
-    {   
-        ApplyRotation(rotationSpeed);
-    }
-
-    public void RotateRight()
-    {
-        ApplyRotation(-rotationSpeed);
+        // Rotation
+        if(rotateLeft) ApplyRotation(rotationSpeed);
+        else if(rotateRight) ApplyRotation(-rotationSpeed);
     }
 
     void ApplyRotation(float rotationValue)
@@ -39,4 +40,20 @@ public class PlayerController : MonoBehaviour
         transform.Rotate(Vector3.forward * rotationValue * Time.deltaTime);
         rb.freezeRotation = false;
     }
+
+    #region "UI Input Methods"
+    
+    public void Thrust() => canThrust = true; 
+
+    public void StopThrust() => canThrust = false;
+
+    public void RotateLeft() => rotateLeft = true;
+
+    public void StopRotateLeft() => rotateLeft = false;
+
+    public void RotateRight() => rotateRight = true;   
+
+    public void StopRotateRight() => rotateRight = false;
+    
+    #endregion
 }
